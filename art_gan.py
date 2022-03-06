@@ -13,7 +13,7 @@ PREVIEW_COLS = 7
 PREVIEW_MARGIN = 4
 SAVE_FREQ = 100# Size vector to generate images from
 NOISE_SIZE = 100# Configuration
-EPOCHS = 10000 # number of iterations
+EPOCHS = 6000 # number of iterations
 BATCH_SIZE = 32
 GENERATE_RES = 3
 IMAGE_SIZE = 128 # rows/cols
@@ -94,9 +94,9 @@ def save_images(cnt, noise):
             output_path = 'output'
     if not os.path.exists(output_path):
         os.makedirs(output_path)
-        filename = os.path.join(output_path, f"trained-{cnt}.png")
-	im = Image.fromarray(image_array)
-	im.save(filename)
+    filename = os.path.join(output_path, f"trained-{cnt}.png")
+    im = Image.fromarray(image_array)
+    im.save(filename)
     
 image_shape = (IMAGE_SIZE, IMAGE_SIZE, IMAGE_CHANNELS)
 optimizer = Adam(1.5e-4, 0.5)
@@ -121,13 +121,12 @@ for epoch in range(EPOCHS):
     noise= np.random.normal(0, 1, (BATCH_SIZE, NOISE_SIZE))
     x_fake = generator.predict(noise)
     discriminator_metric_real = discriminator.train_on_batch(x_real, y_real)
-	discriminator_metric_generated = discriminator.train_on_batch(
-	 x_fake, y_fake)
-	discriminator_metric = 0.5 * np.add(discriminator_metric_real, discriminator_metric_generated)
-	generator_metric = combined.train_on_batch(noise, y_real)
-	if epoch % SAVE_FREQ == 0:
-		save_images(cnt, fixed_noise)
-		cnt += 1
-		print(f"{epoch} epoch, Discriminator accuracy: {100*  discriminator_metric[1]}, Generator accuracy: {100 * generator_metric[1]}")
+    discriminator_metric_generated = discriminator.train_on_batch(x_fake, y_fake)
+    discriminator_metric = 0.5 * np.add(discriminator_metric_real, discriminator_metric_generated)
+    generator_metric = combined.train_on_batch(noise, y_real)
+    if epoch % SAVE_FREQ == 0:
+      save_images(cnt, fixed_noise)
+      cnt += 1
+      print(f"{epoch} epoch, Discriminator accuracy: {100*  discriminator_metric[1]}, Generator accuracy: {100 * generator_metric[1]}")
 	   
    
